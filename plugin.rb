@@ -211,7 +211,7 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
 
     bearer_token = "Bearer #{token}"
     connection = Faraday.new { |f| f.adapter FinalDestination::FaradayAdapter }
-    headers = { 'Authorization' => bearer_token, 'Accept' => 'application/json' }
+    headers = { 'Authorization' => bearer_token, 'Accept' => 'application/json', 'x-authing-app-id' => SiteSetting.oauth2_client_id }
     user_json_response = connection.run_request(user_json_method, user_json_url, nil, headers)
 
     log("user_json_response: #{user_json_response.inspect}")
