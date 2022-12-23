@@ -283,6 +283,19 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
   def enabled?
     SiteSetting.oauth2_enabled
   end
+
+  def revoca_token
+    revocation_method = SiteSetting.oauth2_revocation_url_method.downcase.to_sym
+    revocation_url = SiteSetting.oauth2_revocation_url
+    connection = Faraday.new { |f| f.adapter FinalDestination::FaradayAdapter }
+    headers = { 'Accept' => 'application/json' }
+    body = { client_id: SiteSetting.oauth2_client_id,
+             client_secret: SiteSetting.oauth2_client_secret,
+             token: 111}.to_json
+    body = JSON.parse(body).to_s.gsub('=>', ':')
+    revocation_response = connection.run_request(revocation_method, revocation_url, body, headers)
+    log("revoca response: #{revocation_response.inspect}")
+  end
 end
 
 auth_provider title_setting: "oauth2_button_title",
